@@ -1,5 +1,10 @@
 use glium::{
-    glutin::{event_loop::EventLoop, window::{Fullscreen, WindowBuilder}, ContextBuilder, dpi::LogicalSize},
+    glutin::{
+        dpi::LogicalSize,
+        event_loop::EventLoop,
+        window::{Fullscreen, WindowBuilder},
+        ContextBuilder,
+    },
     Display,
 };
 

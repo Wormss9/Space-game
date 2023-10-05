@@ -6,20 +6,21 @@ use glium::{
     Display, Surface,
 };
 
-use crate::clock::Clock;
+use crate::state::State;
 
 pub fn event_handler(
     display: &Display,
-    clock: &mut Clock,
+    state: &mut State,
     event: event::Event<()>,
     _event_loop_window_target: &EventLoopWindowTarget<()>,
     control_flow: &mut ControlFlow,
 ) {
-    let (_delta_time, _time_squared) = clock.get_time();
+    let (delta_time, _time_squared) = state.clock.get_time();
+    println!("{delta_time} {_time_squared}");
 
     let mut target = display.draw();
 
-    target.clear_color(0.5, 0.5, 0.0, 0.0);
+    target.clear_color(0.0, 0.0, 0.7, 0.0);
 
     let _ = target.finish();
 

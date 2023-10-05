@@ -1,9 +1,31 @@
-pub enum GameState {
-    MainMenu,
-    Settings,
-    InGame(InGameState),
+use std::collections::HashMap;
+
+use hecs::World;
+
+use self::{clock::Clock, game_state::GameState, textures::Textures};
+
+mod clock;
+mod game_state;
+mod textures;
+
+pub struct State {
+    // pub calendar: GameCalendar,
+    pub clock: Clock,
+    pub world: World,
+    pub textures: Textures,
+    // pub sounds: HashMap<String, glium::AudioBuffer>,
+    pub game_state: GameState,
+    pub programs: HashMap<String, glium::Program>,
 }
-pub enum InGameState {
-    Paused,
-    Playing,
+
+impl State {
+    pub fn new() -> Self {
+        Self {
+            clock: Clock::new(),
+            world: World::new(),
+            textures: Textures::new(),
+            game_state: GameState::MainMenu,
+            programs: HashMap::new(),
+        }
+    }
 }
