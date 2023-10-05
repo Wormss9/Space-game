@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+use glium::Display;
 use hecs::World;
 
 use self::{clock::Clock, game_state::GameState, textures::Textures};
@@ -19,11 +20,11 @@ pub struct State {
 }
 
 impl State {
-    pub fn new() -> Self {
+    pub fn new(display: &Display) -> Self {
         Self {
             clock: Clock::new(),
             world: World::new(),
-            textures: Textures::new(),
+            textures: Textures::new(display),
             game_state: GameState::MainMenu,
             programs: HashMap::new(),
         }
