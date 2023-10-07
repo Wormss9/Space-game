@@ -45,12 +45,9 @@ impl Textures {
                 }
             }
         }
-
-        println!("Textures: {:?}", textures);
-
         textures
     }
-    pub fn get_texture(&self, group: String, texture: String) -> Option<&Texture2d> {
-        self.textures.get(&group)?.get(&texture)
+    pub fn get_texture(&self, group: &str, texture: &str) -> Option<&Texture2d> {
+        self.textures.get(group)?.get(texture)
     }
 }

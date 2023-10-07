@@ -8,15 +8,14 @@ use glium::{
 
 use crate::state::State;
 
-pub fn event_handler(
+pub fn run_systems(
     display: &Display,
     state: &mut State,
     event: event::Event<()>,
     _event_loop_window_target: &EventLoopWindowTarget<()>,
     control_flow: &mut ControlFlow,
 ) {
-    let (delta_time, _time_squared) = state.clock.get_time();
-    println!("{delta_time} {_time_squared}");
+    let (_delta_time, _time_squared) = state.clock.get_time();
 
     let mut target = display.draw();
 

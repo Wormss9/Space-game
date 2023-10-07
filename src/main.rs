@@ -1,19 +1,20 @@
+use components::{Floor, PlayerControlled, Ship};
 use glium::{
     glutin::{
         event,
         event_loop::{ControlFlow, EventLoop},
     },
-    program::{ProgramCreationInput, SourceCode},
-    Program, Surface,
+    uniform, Blend, DrawParameters, Surface,
 };
+use hecs::Entity;
 use settings::Settings;
-use state::State;
-use vertex::Vertex;
+use state::{ProgramName, State, VertexBufferName};
 use window::create_display;
 
-mod event_handler;
+mod components;
 mod settings;
 mod state;
+mod systems;
 mod vertex;
 mod window;
 
@@ -22,74 +23,114 @@ fn main() {
     let settings = Settings::get_config(&event_loop);
     let display = create_display(&event_loop, &settings);
 
-    // Read the vertex shader code from a file.
-    let vertex_shader_code = std::fs::read_to_string("shaders/test.vert").unwrap();
-
-    // Read the fragment shader code from a file.
-    let fragment_shader_code = std::fs::read_to_string("shaders/test.frag").unwrap();
-
-    // Create a program creation input from the vertex shader code and the fragment shader code.
-    let program_creation_input_source = SourceCode {
-        vertex_shader: &vertex_shader_code,
-        tessellation_control_shader: None,
-        tessellation_evaluation_shader: None,
-        geometry_shader: None,
-        fragment_shader: &fragment_shader_code,
-    };
-
-    let program = ProgramCreationInput::from(program_creation_input_source);
-
-    // draw the triangle here
-    // Create a shader program.
-    let program = Program::new(&display, program).unwrap();
-
     let mut state = State::new(&display);
 
-    println!("{:?}",state.textures.get_texture("test".to_owned(), "base".to_owned()));
+    let control = PlayerControlled {};
+    let ship = Ship {
+        position: [0.0, 0.0],
+        rotation: 0.0,
+    };
 
-    let vertex1 = Vertex {
-        position: [0.0, 0.5],
-    };
-    let vertex2 = Vertex {
-        position: [-0.433 * 9.0 / 16.0, 0.25],
-    };
-    let vertex3 = Vertex {
-        position: [0.433 * 9.0 / 16.0, 0.25],
-    };
-    let vertex4 = Vertex {
-        position: [-0.433 * 9.0 / 16.0, -0.25],
-    };
-    let vertex5 = Vertex {
-        position: [0.433 * 9.0 / 16.0, -0.25],
-    };
-    let vertex6 = Vertex {
-        position: [0.0, -0.5],
-    };
-    let shape = [vertex1, vertex2, vertex3, vertex4, vertex5, vertex6];
+    let ship_entity = state.world.spawn((control, ship));
 
-    let vertex_buffer = glium::VertexBuffer::new(&display, &shape).unwrap();
+    let floor = Floor {
+        position: [0, 0],
+        texture: "floor1".to_owned(),
+    };
+
+    state.world.spawn((ship_entity, floor));
 
     let indices = glium::index::NoIndices(glium::index::PrimitiveType::TriangleStrip);
 
+    let mut x_pos = 0.5 as f32;
+    let mut y_pos = 0.5;
+
+    let mut scale = 0.5 as f32;
+    let mut rotation = 0.0;
+
     event_loop.run(move |ev, _, control_flow| {
+        let ratio = 9.0 / 16.0 as f32;
         let mut target = display.draw();
         target.clear_color(0.0, 0.0, 1.0, 1.0);
 
-        target
-            .draw(
-                &vertex_buffer,
-                &indices,
-                &program,
-                &glium::uniforms::EmptyUniforms,
-                &Default::default(),
-            )
-            .unwrap();
+        let draw_parameters = DrawParameters {
+            blend: Blend::alpha_blending(),
+            viewport: None,
+            ..Default::default()
+        };
+
+        let mut ships = state.world.query::<(&Ship)>();
+        let mut floors = state.world.query::<(&Entity,&Floor)>();
+        for (entity, ship) in ships.iter() {
+            println!("{:?} {:?}", entity, ship);
+            for (_,(floor_entity,floor)) in floors.iter(){
+                println!("{:?} {:?}", floor_entity, floor);
+                let uniforms = uniform! {
+                    tex: glium::uniforms::Sampler::new(state.textures.get_texture("floors", &floor.texture).unwrap())
+                    .magnify_filter(glium::uniforms::MagnifySamplerFilter::Nearest)
+                    .minify_filter(glium::uniforms::MinifySamplerFilter::Nearest)
+                    .wrap_function(glium::uniforms::SamplerWrapFunction::BorderClamp),
+                    mov:ship.position,
+                    sca:state.scale,
+                    rot:ship.rotation,
+                    rat:ratio
+                };
+
+                target
+                .draw(
+                    state.vertex_buffers.get(&VertexBufferName::Hex),
+                    &indices,
+                    state.programs.get(&ProgramName::Hex),
+                    &uniforms,
+                    &draw_parameters,
+                )
+                .unwrap();
+            }
+        }
+
         target.finish().unwrap();
 
         match ev {
             event::Event::WindowEvent { event, .. } => match event {
                 event::WindowEvent::CloseRequested => {
                     *control_flow = ControlFlow::Exit;
+                }
+                event::WindowEvent::KeyboardInput { input, .. } => {
+                    if let event::ElementState::Pressed = input.state {
+                        match input.virtual_keycode {
+                            Some(event::VirtualKeyCode::A) => {
+                                x_pos = x_pos - 0.05;
+                            }
+                            Some(event::VirtualKeyCode::D) => {
+                                x_pos = x_pos + 0.05;
+                            }
+                            Some(event::VirtualKeyCode::W) => {
+                                y_pos = y_pos + 0.05;
+                            }
+                            Some(event::VirtualKeyCode::S) => {
+                                y_pos = y_pos - 0.05;
+                            }
+                            Some(event::VirtualKeyCode::LControl) => {
+                                scale = scale - 0.05;
+                            }
+                            Some(event::VirtualKeyCode::LShift) => {
+                                scale = scale + 0.05;
+                            }
+                            Some(event::VirtualKeyCode::Q) => {
+                                rotation = rotation - 0.05;
+                                if rotation < 0.0 {
+                                    rotation += std::f32::consts::PI;
+                                }
+                            }
+                            Some(event::VirtualKeyCode::E) => {
+                                rotation = rotation + 0.05;
+                                if rotation > std::f32::consts::PI {
+                                    rotation -= std::f32::consts::PI;
+                                }
+                            }
+                            _ => {}
+                        }
+                    }
                 }
                 _ => (),
             },
@@ -98,7 +139,7 @@ fn main() {
     });
 
     // event_loop.run(move |event, event_loop_window_target, control_flow| {
-    //     event_handler::event_handler(
+    //     systems::run_systems(
     //         &display,
     //         &mut state,
     //         event,

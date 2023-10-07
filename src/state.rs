@@ -1,13 +1,19 @@
-use std::collections::HashMap;
-
 use glium::Display;
 use hecs::World;
 
-use self::{clock::Clock, game_state::GameState, textures::Textures};
+pub use self::{
+    clock::Clock,
+    game_state::GameState,
+    programs::{ProgramName, Programs},
+    textures::Textures,
+    vertex_buffers::{VertexBufferName, VertexBuffers},
+};
 
 mod clock;
 mod game_state;
+mod programs;
 mod textures;
+mod vertex_buffers;
 
 pub struct State {
     // pub calendar: GameCalendar,
@@ -16,7 +22,9 @@ pub struct State {
     pub textures: Textures,
     // pub sounds: HashMap<String, glium::AudioBuffer>,
     pub game_state: GameState,
-    pub programs: HashMap<String, glium::Program>,
+    pub programs: Programs,
+    pub vertex_buffers: VertexBuffers,
+    pub scale: f32,
 }
 
 impl State {
@@ -26,7 +34,9 @@ impl State {
             world: World::new(),
             textures: Textures::new(display),
             game_state: GameState::MainMenu,
-            programs: HashMap::new(),
+            programs: Programs::new(display),
+            vertex_buffers: VertexBuffers::new(display),
+            scale: 1.0,
         }
     }
 }
