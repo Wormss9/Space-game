@@ -25,6 +25,7 @@ pub struct State {
     pub programs: Programs,
     pub vertex_buffers: VertexBuffers,
     pub scale: f32,
+    pub aspect_ratio: f64,
 }
 
 impl State {
@@ -37,6 +38,7 @@ impl State {
             programs: Programs::new(display),
             vertex_buffers: VertexBuffers::new(display),
             scale: 1.0,
+            aspect_ratio: 1.0,
         }
     }
 }

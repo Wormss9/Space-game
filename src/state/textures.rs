@@ -26,20 +26,16 @@ impl Textures {
         let mut textures = HashMap::new();
 
         if let Ok(directories) = fs::read_dir(TEXTURES_PATH) {
-            for directory in directories {
-                if let Ok(directory) = directory {
-                    if let Ok(images) = fs::read_dir(directory.path()) {
-                        let subtextures = textures
-                            .entry(directory.file_name().to_string_lossy().to_string())
-                            .or_insert(HashMap::new());
-                        for image in images {
-                            if let Ok(image) = image {
-                                if let Some(texture) = Self::load_texture(display, image.path()) {
-                                    let name = image.file_name().to_string_lossy().to_string();
-                                    let name = &name[0..name.len() - 4];
-                                    subtextures.insert(name.to_owned(), texture);
-                                }
-                            }
+            for directory in directories.flatten() {
+                if let Ok(images) = fs::read_dir(directory.path()) {
+                    let subtextures = textures
+                        .entry(directory.file_name().to_string_lossy().to_string())
+                        .or_insert(HashMap::new());
+                    for image in images.flatten() {
+                        if let Some(texture) = Self::load_texture(display, image.path()) {
+                            let name = image.file_name().to_string_lossy().to_string();
+                            let name = &name[0..name.len() - 4];
+                            subtextures.insert(name.to_owned(), texture);
                         }
                     }
                 }

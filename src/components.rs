@@ -1,9 +1,11 @@
+use crate::vector::Vector;
+
 pub struct PlayerControlled {}
 
 #[derive(Debug)]
 
 pub struct Ship {
-    pub position: [f32; 2],
+    pub position: Vector,
     pub rotation: f32,
 }
 
