@@ -28,7 +28,7 @@ pub fn render_system(state: &State) {
                 .magnify_filter(glium::uniforms::MagnifySamplerFilter::Nearest)
                 .minify_filter(glium::uniforms::MinifySamplerFilter::Nearest)
                 .wrap_function(glium::uniforms::SamplerWrapFunction::BorderClamp),
-                mov:adjust_a_r((ship.position+coords_to_pos(&floor.position, state.scale, ship.rotation)).position,9.0/16.0),
+                mov:adjust_a_r((ship.position+coords_to_pos(&floor.position, state.scale, ship.rotation)).position,state.aspect_ratio),
                 sca:state.scale,
                 rot:ship.rotation,
                 rat:state.aspect_ratio
@@ -49,8 +49,10 @@ pub fn render_system(state: &State) {
 }
 
 fn coords_to_pos(coord: &[i32; 2], scale: f32, rotaton: f32) -> Vector {
-    let x_offset = 1.0 / 1.11 / 2.05 / 9.0 * 16.0;
-    let y_offset = 3.0 / 4.0 * 1.87;
+    //Hexagon height is 2
+
+    let x_offset = 8.0 / 9.0 / 1.11; //Hexagon size ratio / texture scale
+    let y_offset = 6.0 / 4.0 / 1.11; //Height * vertical spacing / texture scale
 
     let ur = Vector {
         position: [x_offset, y_offset],
@@ -71,5 +73,5 @@ fn coords_to_pos(coord: &[i32; 2], scale: f32, rotaton: f32) -> Vector {
 }
 
 fn adjust_a_r(pos: [f32; 2], ar: f32) -> [f32; 2] {
-    [pos[0] * ar, pos[1]]
+    [pos[0] / ar, pos[1]]
 }

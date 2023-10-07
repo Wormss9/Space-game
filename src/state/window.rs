@@ -8,7 +8,7 @@ use glium::{
     Display,
 };
 
-use crate::settings::{FullscreenSetting, Settings};
+use super::settings::{FullscreenSetting, Settings};
 
 impl FullscreenSetting {
     pub fn to_setting(&self, event_loop: &EventLoop<()>) -> Option<Fullscreen> {

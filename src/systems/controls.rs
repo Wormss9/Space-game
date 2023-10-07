@@ -2,7 +2,7 @@ use crate::{
     components::{PlayerControlled, Ship},
     state::State,
 };
-use glium::glutin::{event, event_loop::ControlFlow};
+use glium::glutin::{dpi::PhysicalSize, event, event_loop::ControlFlow};
 
 pub fn controls_system(state: &mut State, ev: event::Event<()>, control_flow: &mut ControlFlow) {
     let mut controlled_ship: Option<&mut Ship> = None;
@@ -15,6 +15,9 @@ pub fn controls_system(state: &mut State, ev: event::Event<()>, control_flow: &m
 
     match ev {
         event::Event::WindowEvent { event, .. } => match event {
+            event::WindowEvent::Resized(PhysicalSize { width, height }) => {
+                state.aspect_ratio = width as f32 / height as f32;
+            }
             event::WindowEvent::CloseRequested => {
                 *control_flow = ControlFlow::Exit;
             }

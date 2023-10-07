@@ -28,19 +28,19 @@ fn hex_buffer(display: &Display) -> VertexBuffer<Vertex> {
             tex_coords: [0.5, 1.055],
         },
         Vertex {
-            position: [-0.866, 0.5],
+            position: [-8.0 / 9.0, 0.5],
             tex_coords: [-0.055, 0.7775],
         },
         Vertex {
-            position: [0.866, 0.5],
+            position: [8.0 / 9.0, 0.5],
             tex_coords: [1.055, 0.7775],
         },
         Vertex {
-            position: [-0.866, -0.5],
+            position: [-8.0 / 9.0, -0.5],
             tex_coords: [-0.055, 0.2225],
         },
         Vertex {
-            position: [0.866, -0.5],
+            position: [8.0 / 9.0, -0.5],
             tex_coords: [1.055, 0.2225],
         },
         Vertex {

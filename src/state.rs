@@ -2,14 +2,14 @@ pub use self::{
     clock::Clock,
     game_state::GameState,
     programs::{ProgramName, Programs},
+    settings::Settings,
     textures::Textures,
     vertex_buffers::{VertexBufferName, VertexBuffers},
+    window::create_display,
 };
 use crate::{
     components::{Floor, PlayerControlled, Ship},
-    settings::Settings,
     vector::Vector,
-    window::create_display,
 };
 use glium::{glutin::event_loop::EventLoop, Display};
 use hecs::World;
@@ -17,8 +17,10 @@ use hecs::World;
 mod clock;
 mod game_state;
 mod programs;
+mod settings;
 mod textures;
 mod vertex_buffers;
+mod window;
 
 pub struct State {
     pub settings: Settings,
@@ -39,6 +41,8 @@ impl State {
     pub fn new(event_loop: &EventLoop<()>) -> Self {
         let settings = Settings::get_config(event_loop);
         let display = create_display(event_loop, &settings);
+        let (x, y) = display.get_framebuffer_dimensions();
+        let aspect_ratio = x as f32 / y as f32;
 
         Self {
             settings,
@@ -49,7 +53,7 @@ impl State {
             programs: Programs::new(&display),
             vertex_buffers: VertexBuffers::new(&display),
             scale: 1.0,
-            aspect_ratio: 9.0 / 16.0,
+            aspect_ratio,
             display,
         }
     }
