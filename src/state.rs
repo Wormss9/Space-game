@@ -17,7 +17,7 @@ use hecs::World;
 mod clock;
 mod game_state;
 mod programs;
-mod settings;
+pub mod settings;
 mod textures;
 mod vertex_buffers;
 mod window;

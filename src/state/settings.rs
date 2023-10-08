@@ -1,13 +1,17 @@
+use self::keybindings::{get_default_keybindings, KeyBinding};
 use glium::glutin::event_loop::EventLoop;
 use serde::Deserialize;
 use std::fs::File;
 use std::io::Read;
+
+pub mod keybindings;
 
 #[derive(Debug, Deserialize)]
 pub struct Settings {
     pub window_width: u32,
     pub window_height: u32,
     pub fullscreen: FullscreenSetting,
+    pub keybinds: Vec<KeyBinding>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -19,7 +23,7 @@ pub enum FullscreenSetting {
 
 pub enum ConfigError {
     FileError(std::io::Error),
-    ParseError(serde_json::Error),
+    ParseError(ron::error::SpannedError),
 }
 
 impl Settings {
@@ -28,7 +32,7 @@ impl Settings {
         let mut contents = String::new();
         file.read_to_string(&mut contents)
             .map_err(ConfigError::FileError)?;
-        serde_json::from_str(&contents).map_err(ConfigError::ParseError)
+        ron::from_str(&contents).map_err(ConfigError::ParseError)
     }
     fn create_config(event_loop: &EventLoop<()>) -> Self {
         let (window_width, window_height) = match event_loop.primary_monitor() {
@@ -41,7 +45,8 @@ impl Settings {
         Self {
             window_width,
             window_height,
-            fullscreen: FullscreenSetting::Exclusive,
+            fullscreen: FullscreenSetting::Borderless,
+            keybinds: get_default_keybindings(),
         }
     }
     pub fn get_config(event_loop: &EventLoop<()>) -> Self {
