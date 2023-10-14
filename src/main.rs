@@ -5,7 +5,7 @@ mod state;
 mod systems;
 mod vector;
 mod vertex;
-mod entities;
+mod components;
 
 fn main() {
     let event_loop = EventLoop::new();

@@ -4,9 +4,14 @@ use glium::glutin::{
     event_loop::{ControlFlow, EventLoopWindowTarget},
 };
 
-use self::{controls::controls_system, render::render_system};
+use self::{
+    controls::controls_system, gravity::gravity_system, movement::movement_system,
+    render::render_system,
+};
 
 mod controls;
+mod gravity;
+mod movement;
 mod render;
 
 pub fn run_systems(
@@ -15,8 +20,10 @@ pub fn run_systems(
     _event_loop_window_target: &EventLoopWindowTarget<()>,
     control_flow: &mut ControlFlow,
 ) {
-    let (_delta_time, _time_squared) = state.clock.get_time();
+    let delta_time_data = state.clock.get_time();
 
+    gravity_system(state);
+    movement_system(state, delta_time_data);
     render_system(state);
     controls_system(state, event, control_flow);
 }

@@ -5,7 +5,7 @@ pub fn controls_system(state: &mut State, ev: event::Event<()>, control_flow: &m
     match ev {
         event::Event::WindowEvent { event, .. } => match event {
             event::WindowEvent::Resized(PhysicalSize { width, height }) => {
-                state.aspect_ratio = width as f32 / height as f32;
+                state.camera.aspect_ratio = width as f64 / height as f64;
             }
             event::WindowEvent::CloseRequested => {
                 *control_flow = ControlFlow::Exit;
@@ -36,24 +36,25 @@ fn perform_action(action: Actions, state: &mut State) {
     match action {
         Actions::SaveShip => todo!(),
         Actions::LoadShip => todo!(),
-        // Actions::MoveUp => controlled_ship.position.position[1] += 0.05,
-        // Actions::MoveDown => controlled_ship.position.position[1] -= 0.05,
-        // Actions::MoveLeft => controlled_ship.position.position[0] -= 0.05,
-        // Actions::MoveRight => controlled_ship.position.position[0] += 0.05,
-        // Actions::RotateClockwise => {
-        //     controlled_ship.rotation += 0.05;
-        //     if controlled_ship.rotation > std::f32::consts::PI * 2.0 {
-        //         controlled_ship.rotation -= std::f32::consts::PI * 2.0;
-        //     }
-        // }
-        // Actions::RotateCounterClockwise => {
-        //     controlled_ship.rotation -= 0.05;
-        //     if controlled_ship.rotation < 0.0 {
-        //         controlled_ship.rotation += std::f32::consts::PI * 2.0;
-        //     }
-        // }
-        Actions::ZoomIn => state.scale *= 1.05,
-        Actions::ZoomOut => state.scale /= 1.05,
+        Actions::MoveUp => state.camera.position.position[1] += state.camera.scale,
+        Actions::MoveDown => state.camera.position.position[1] -= state.camera.scale,
+        Actions::MoveLeft => state.camera.position.position[0] -= state.camera.scale,
+        Actions::MoveRight => state.camera.position.position[0] += state.camera.scale,
+        Actions::RotateClockwise => {
+            state.camera.rotation += 0.05;
+            if state.camera.rotation > std::f64::consts::PI * 2.0 {
+                state.camera.rotation -= std::f64::consts::PI * 2.0;
+            }
+        }
+        Actions::RotateCounterClockwise => {
+            state.camera.rotation -= 0.05;
+            if state.camera.rotation < 0.0 {
+                state.camera.rotation += std::f64::consts::PI * 2.0;
+            }
+        }
+        Actions::ZoomIn => state.camera.scale *= 1.05,
+        Actions::ZoomOut => state.camera.scale /= 1.05,
         _ => (),
     }
+    println!("{:?}", state.camera)
 }

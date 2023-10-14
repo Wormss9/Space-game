@@ -1,6 +1,9 @@
 use glium::{uniform, Blend, DrawParameters, Surface};
 
-use crate::state::{ProgramName, State, VertexBufferName};
+use crate::{
+    components::{Position, Rotation, Ship, ShipParts},
+    state::{ProgramName, State, VertexBufferName},
+};
 
 pub fn render_system(state: &State) {
     let indices = glium::index::NoIndices(glium::index::PrimitiveType::TriangleStrip);
@@ -14,23 +17,27 @@ pub fn render_system(state: &State) {
         ..Default::default()
     };
 
-    for ship in state.ships.iter() {
+    for (_, (ship, position, rotation)) in
+        state.world.query::<(&Ship, &Position, &Rotation)>().iter()
+    {
         for part in ship.parts.iter() {
-            let (position, texture_type, texture_name) = match part {
-                crate::entities::ship::ShipParts::Floor(floor) => {
-                    (floor.position, "floors", &floor.texture)
-                }
+            let (part_position, texture_type, texture_name) = match part {
+                ShipParts::Floor(floor) => (floor.position, "floors", &floor.texture),
             };
+
+            let scale = state.camera.scale;
+            let rotation = rotation.rotation + state.camera.rotation;
+            let aspect_ratio = state.camera.aspect_ratio;
 
             let uniforms = uniform! {
                 tex: glium::uniforms::Sampler::new(state.textures.get_texture(texture_type, texture_name).unwrap())
                 .magnify_filter(glium::uniforms::MagnifySamplerFilter::Nearest)
                 .minify_filter(glium::uniforms::MinifySamplerFilter::Nearest)
                 .wrap_function(glium::uniforms::SamplerWrapFunction::BorderClamp),
-                mov:ship.position.adjust_position(&position, state.scale, ship.rotation).adjust_ratio(state.aspect_ratio).position,
-                sca:state.scale,
-                rot:ship.rotation,
-                rat:state.aspect_ratio
+                mov:((position.position*scale).adjust_position(&part_position, state.camera.scale, rotation).adjust_ratio(state.camera.aspect_ratio) + state.camera.position).as_f32(),
+                sca:scale as f32,
+                rot:rotation as f32,
+                rat:aspect_ratio as f32
             };
 
             target
