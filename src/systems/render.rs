@@ -1,10 +1,6 @@
 use glium::{uniform, Blend, DrawParameters, Surface};
-use hecs::Entity;
 
-use crate::{
-    components::{Floor, Ship},
-    state::{ProgramName, State, VertexBufferName},
-};
+use crate::state::{ProgramName, State, VertexBufferName};
 
 pub fn render_system(state: &State) {
     let indices = glium::index::NoIndices(glium::index::PrimitiveType::TriangleStrip);
@@ -18,16 +14,20 @@ pub fn render_system(state: &State) {
         ..Default::default()
     };
 
-    let mut ships = state.world.query::<&Ship>();
-    let mut floors = state.world.query::<(&Entity, &Floor)>();
-    for (_entity, ship) in ships.iter() {
-        for (_, (_floor_entity, floor)) in floors.iter() {
+    for ship in state.ships.iter() {
+        for part in ship.parts.iter() {
+            let (position, texture_type, texture_name) = match part {
+                crate::entities::ship::ShipParts::Floor(floor) => {
+                    (floor.position, "floors", &floor.texture)
+                }
+            };
+
             let uniforms = uniform! {
-                tex: glium::uniforms::Sampler::new(state.textures.get_texture("floors", &floor.texture).unwrap())
+                tex: glium::uniforms::Sampler::new(state.textures.get_texture(texture_type, texture_name).unwrap())
                 .magnify_filter(glium::uniforms::MagnifySamplerFilter::Nearest)
                 .minify_filter(glium::uniforms::MinifySamplerFilter::Nearest)
                 .wrap_function(glium::uniforms::SamplerWrapFunction::BorderClamp),
-                mov:ship.position.adjust_position(&floor.position, state.scale, ship.rotation).adjust_ratio(state.aspect_ratio).position,
+                mov:ship.position.adjust_position(&position, state.scale, ship.rotation).adjust_ratio(state.aspect_ratio).position,
                 sca:state.scale,
                 rot:ship.rotation,
                 rat:state.aspect_ratio

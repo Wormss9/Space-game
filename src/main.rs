@@ -1,11 +1,11 @@
 use glium::glutin::event_loop::EventLoop;
 use state::State;
 
-mod components;
 mod state;
 mod systems;
 mod vector;
 mod vertex;
+mod entities;
 
 fn main() {
     let event_loop = EventLoop::new();

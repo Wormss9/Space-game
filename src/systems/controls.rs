@@ -1,7 +1,4 @@
-use crate::{
-    components::{PlayerControlled, Ship},
-    state::{settings::keybindings::Actions, State},
-};
+use crate::state::{settings::keybindings::Actions, State};
 use glium::glutin::{dpi::PhysicalSize, event, event_loop::ControlFlow};
 
 pub fn controls_system(state: &mut State, ev: event::Event<()>, control_flow: &mut ControlFlow) {
@@ -36,34 +33,27 @@ fn handle_input(state: &mut State, input: Option<event::VirtualKeyCode>) {
 }
 
 fn perform_action(action: Actions, state: &mut State) {
-    let mut controlled_ship: Option<&mut Ship> = None;
-
-    let ships = state.world.query_mut::<(&PlayerControlled, &mut Ship)>();
-    for (_, (_, ship)) in ships.into_iter() {
-        controlled_ship = Some(ship)
-    }
-    let controlled_ship = controlled_ship.unwrap();
-
     match action {
         Actions::SaveShip => todo!(),
         Actions::LoadShip => todo!(),
-        Actions::MoveUp => controlled_ship.position.position[1] += 0.05,
-        Actions::MoveDown => controlled_ship.position.position[1] -= 0.05,
-        Actions::MoveLeft => controlled_ship.position.position[0] -= 0.05,
-        Actions::MoveRight => controlled_ship.position.position[0] += 0.05,
-        Actions::RotateClockwise => {
-            controlled_ship.rotation += 0.05;
-            if controlled_ship.rotation > std::f32::consts::PI * 2.0 {
-                controlled_ship.rotation -= std::f32::consts::PI * 2.0;
-            }
-        }
-        Actions::RotateCounterClockwise => {
-            controlled_ship.rotation -= 0.05;
-            if controlled_ship.rotation < 0.0 {
-                controlled_ship.rotation += std::f32::consts::PI * 2.0;
-            }
-        }
+        // Actions::MoveUp => controlled_ship.position.position[1] += 0.05,
+        // Actions::MoveDown => controlled_ship.position.position[1] -= 0.05,
+        // Actions::MoveLeft => controlled_ship.position.position[0] -= 0.05,
+        // Actions::MoveRight => controlled_ship.position.position[0] += 0.05,
+        // Actions::RotateClockwise => {
+        //     controlled_ship.rotation += 0.05;
+        //     if controlled_ship.rotation > std::f32::consts::PI * 2.0 {
+        //         controlled_ship.rotation -= std::f32::consts::PI * 2.0;
+        //     }
+        // }
+        // Actions::RotateCounterClockwise => {
+        //     controlled_ship.rotation -= 0.05;
+        //     if controlled_ship.rotation < 0.0 {
+        //         controlled_ship.rotation += std::f32::consts::PI * 2.0;
+        //     }
+        // }
         Actions::ZoomIn => state.scale *= 1.05,
         Actions::ZoomOut => state.scale /= 1.05,
+        _ => (),
     }
 }

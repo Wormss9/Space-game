@@ -1,6 +1,8 @@
 use std::ops::{Add, Mul, Neg, Sub};
 
-#[derive(Debug, Clone, Copy)]
+use serde::Deserialize;
+
+#[derive(Debug, Clone, Copy, Deserialize)]
 pub struct Vector {
     pub position: [f32; 2],
 }
