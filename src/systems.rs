@@ -22,6 +22,8 @@ pub fn run_systems(
 ) {
     let delta_time_data = state.clock.get_time();
 
+    state.camera.update(&state.world);
+
     gravity_system(state);
     movement_system(state, delta_time_data);
     render_system(state);

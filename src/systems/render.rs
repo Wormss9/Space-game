@@ -34,7 +34,7 @@ pub fn render_system(state: &State) {
                 .magnify_filter(glium::uniforms::MagnifySamplerFilter::Nearest)
                 .minify_filter(glium::uniforms::MinifySamplerFilter::Nearest)
                 .wrap_function(glium::uniforms::SamplerWrapFunction::BorderClamp),
-                mov:((position.position*scale).adjust_position(&part_position, state.camera.scale, rotation).adjust_ratio(state.camera.aspect_ratio) + state.camera.position).as_f32(),
+                mov:(((position.position-state.camera.focus_object_position)*scale).adjust_position(&part_position, state.camera.scale, rotation).adjust_ratio(state.camera.aspect_ratio) + state.camera.position).as_f32(),
                 sca:scale as f32,
                 rot:rotation as f32,
                 rat:aspect_ratio as f32

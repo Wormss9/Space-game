@@ -71,7 +71,9 @@ impl State {
             rotation_speed: 0.0,
         };
 
-        self.world.spawn((ship, position, rotation));
+        let focus_object = self.world.spawn((ship, position, rotation));
+
+        self.camera.focus_object = Some(focus_object);
 
         let ship = Ship {
             parts: vec![ShipParts::Floor(Floor {
