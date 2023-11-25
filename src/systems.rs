@@ -4,13 +4,9 @@ use glium::glutin::{
     event_loop::{ControlFlow, EventLoopWindowTarget},
 };
 
-use self::{
-    controls::controls_system, gravity::gravity_system, movement::movement_system,
-    render::render_system,
-};
+use self::{controls::controls_system, movement::movement_system, render::render_system};
 
 mod controls;
-mod gravity;
 mod movement;
 mod render;
 
@@ -24,7 +20,6 @@ pub fn run_systems(
 
     state.camera.update(&state.world);
 
-    gravity_system(state);
     movement_system(state, delta_time_data);
     render_system(state);
     controls_system(state, event, control_flow);

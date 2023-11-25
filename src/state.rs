@@ -9,7 +9,7 @@ pub use self::{
     window::create_display,
 };
 use crate::{
-    components::{Floor, GravityMass, Planet, Position, Rotation, Ship, ShipParts},
+    components::{Position, Rotation, Ship, ShipParts, Tile},
     vector::Vector,
 };
 use glium::{glutin::event_loop::EventLoop, Display};
@@ -54,38 +54,99 @@ impl State {
         }
     }
     pub fn add_test_ship(&mut self) {
-        let ship = Ship {
-            parts: vec![ShipParts::Floor(Floor {
-                position: [0, 0],
-                texture: "floor1".to_owned(),
-            })],
+        let mut ship = Ship {
+            parts: vec![
+                ShipParts::Floor(Tile {
+                    position: [0, 0],
+                    texture: "floor1".to_owned(),
+                }),
+                ShipParts::Floor(Tile {
+                    position: [-1, 0],
+                    texture: "floor1".to_owned(),
+                }),
+                ShipParts::Wall(Tile {
+                    position: [-1, 0],
+                    texture: "wall1".to_owned(),
+                }),
+                ShipParts::Floor(Tile {
+                    position: [0, 1],
+                    texture: "floor1".to_owned(),
+                }),
+                ShipParts::Wall(Tile {
+                    position: [0, 1],
+                    texture: "wall1".to_owned(),
+                }),
+                ShipParts::Floor(Tile {
+                    position: [-1, -1],
+                    texture: "floor1".to_owned(),
+                }),
+                ShipParts::Wall(Tile {
+                    position: [-1, -1],
+                    texture: "wall1".to_owned(),
+                }),
+                ShipParts::Floor(Tile {
+                    position: [1, 1],
+                    texture: "floor1".to_owned(),
+                }),
+                ShipParts::Wall(Tile {
+                    position: [1, 1],
+                    texture: "wall1".to_owned(),
+                }),
+                ShipParts::Floor(Tile {
+                    position: [0, -1],
+                    texture: "floor1".to_owned(),
+                }),
+                ShipParts::Floor(Tile {
+                    position: [1, 0],
+                    texture: "floor1".to_owned(),
+                }),
+                ShipParts::Floor(Tile {
+                    position: [-1, -2],
+                    texture: "floor1".to_owned(),
+                }),
+                ShipParts::Wall(Tile {
+                    position: [-1, -2],
+                    texture: "wall1".to_owned(),
+                }),
+                ShipParts::Floor(Tile {
+                    position: [2, 1],
+                    texture: "floor1".to_owned(),
+                }),
+                ShipParts::Wall(Tile {
+                    position: [2, 1],
+                    texture: "wall1".to_owned(),
+                }),
+                ShipParts::Floor(Tile {
+                    position: [0, -2],
+                    texture: "floor1".to_owned(),
+                }),
+                ShipParts::Wall(Tile {
+                    position: [0, -2],
+                    texture: "wall1".to_owned(),
+                }),
+                ShipParts::Floor(Tile {
+                    position: [1, -1],
+                    texture: "floor1".to_owned(),
+                }),
+                ShipParts::Wall(Tile {
+                    position: [1, -1],
+                    texture: "wall1".to_owned(),
+                }),
+                ShipParts::Floor(Tile {
+                    position: [2, 0],
+                    texture: "floor1".to_owned(),
+                }),
+                ShipParts::Wall(Tile {
+                    position: [2, 0],
+                    texture: "wall1".to_owned(),
+                }),
+            ],
         };
+        ship.sort_parts();
         let position = Position {
-            position: Vector::new(0.0, -2.0),
+            position: Vector::new(0.0, 0.0),
             acceleration: Vector::new(0.0, 0.0),
-            speed: Vector::new(-1.5, 0.0),
-            debug: 0.0,
-        };
-        let rotation = Rotation {
-            rotation: 0.0,
-            rotation_speed: 0.0,
-        };
-
-        let focus_object = self.world.spawn((ship, position, rotation));
-
-        self.camera.focus_object = Some(focus_object);
-
-        let ship = Ship {
-            parts: vec![ShipParts::Floor(Floor {
-                position: [0, 0],
-                texture: "floor1".to_owned(),
-            })],
-        };
-        let position = Position {
-            position: Vector::new(0.0, 3.0),
-            acceleration: Vector::new(0.0, 0.0),
-            speed: Vector::new(2.0, 0.0),
-            debug: 0.0,
+            speed: Vector::new(0.0, 0.0),
         };
         let rotation = Rotation {
             rotation: 0.0,
@@ -93,16 +154,5 @@ impl State {
         };
 
         self.world.spawn((ship, position, rotation));
-
-        let mass = GravityMass { mass: 10.0 };
-        let planet = Planet { radius: 0.5 };
-        let position = Position {
-            position: Vector::new(0.0, 0.0),
-            acceleration: Vector::new(0.0, 0.0),
-            speed: Vector::new(0.0, 0.0),
-            debug: 0.0,
-        };
-
-        self.world.spawn((mass, planet, position));
     }
 }

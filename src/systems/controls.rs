@@ -54,7 +54,5 @@ fn perform_action(action: Actions, state: &mut State) {
         }
         Actions::ZoomIn => state.camera.scale *= 1.05,
         Actions::ZoomOut => state.camera.scale /= 1.05,
-        _ => (),
     }
-    println!("{:?}", state.camera)
 }

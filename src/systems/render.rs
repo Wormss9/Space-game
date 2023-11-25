@@ -23,6 +23,7 @@ pub fn render_system(state: &State) {
         for part in ship.parts.iter() {
             let (part_position, texture_type, texture_name) = match part {
                 ShipParts::Floor(floor) => (floor.position, "floors", &floor.texture),
+                ShipParts::Wall(wall) => (wall.position, "walls", &wall.texture),
             };
 
             let scale = state.camera.scale;

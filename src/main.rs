@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use glium::glutin::event_loop::EventLoop;
 use state::State;
 

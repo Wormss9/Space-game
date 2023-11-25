@@ -5,14 +5,7 @@ use crate::{
 };
 
 pub fn movement_system(state: &mut State, time_data: (f64, f64)) {
-    for (e, position) in state.world.query_mut::<&mut Position>() {
-        if e.to_bits().get() == 4294967296 {
-            let ke = 0.5 * position.speed.length_sqr();
-            let pe = 30.0 - position.acceleration.length() * position.debug;
-            println!("ke: {:?}", ke);
-            println!("pe:{:?}", pe);
-            println!("te: {:?}", ke + pe);
-        }
+    for (_, position) in state.world.query_mut::<&mut Position>() {
         position.speed += position.acceleration * time_data.0;
         position.position +=
             position.speed * time_data.0 + position.acceleration * time_data.1 * 0.5;
