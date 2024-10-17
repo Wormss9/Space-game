@@ -1,6 +1,6 @@
 use std::{collections::HashMap, fs, path::PathBuf};
 
-use glium::{texture::RawImage2d, Display, Texture2d};
+use glium::{glutin::surface::WindowSurface, texture::RawImage2d, Display, Texture2d};
 use image::GenericImageView;
 
 const TEXTURES_PATH: &str = "textures";
@@ -10,19 +10,21 @@ pub struct Textures {
 }
 
 impl Textures {
-    pub fn new(display: &Display) -> Self {
+    pub fn new(display: &Display<WindowSurface>) -> Self {
         Self {
             textures: Self::load_textures(display),
         }
     }
-    fn load_texture(display: &Display, image_path: PathBuf) -> Option<Texture2d> {
+    fn load_texture(display: &Display<WindowSurface>, image_path: PathBuf) -> Option<Texture2d> {
         let dynamic_image = image::open(image_path).ok()?;
         let (width, height) = dynamic_image.dimensions();
         let raw_image =
             RawImage2d::from_raw_rgba_reversed(dynamic_image.as_bytes(), (width, height));
         Texture2d::new(display, raw_image).ok()
     }
-    fn load_textures(display: &Display) -> HashMap<String, HashMap<String, Texture2d>> {
+    fn load_textures(
+        display: &Display<WindowSurface>,
+    ) -> HashMap<String, HashMap<String, Texture2d>> {
         let mut textures = HashMap::new();
 
         if let Ok(directories) = fs::read_dir(TEXTURES_PATH) {

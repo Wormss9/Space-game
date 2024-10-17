@@ -1,19 +1,29 @@
-use crate::state::{settings::keybindings::Actions, State};
-use glium::glutin::{dpi::PhysicalSize, event, event_loop::ControlFlow};
+use winit::{
+    dpi::PhysicalSize,
+    event,
+    keyboard::Key,
+};
 
-pub fn controls_system(state: &mut State, ev: event::Event<()>, control_flow: &mut ControlFlow) {
+use crate::state::{settings::keybindings::Actions, State};
+
+// pub fn controls_system(state: &mut State, ev: WindowEvent) {
+//     match ev {
+//         event::WindowEvent::Resized(PhysicalSize { width, height }) => {
+//             state.camera.aspect_ratio = width as f64 / height as f64;
+//         }
+//         event::WindowEvent::KeyboardInput { event, .. } => handle_input(state, event.logical_key),
+//         _ => (),
+//     }
+// }
+pub fn controls_system(state: &mut State, ev: event::Event<()>) {
     match ev {
         event::Event::WindowEvent { event, .. } => match event {
             event::WindowEvent::Resized(PhysicalSize { width, height }) => {
                 state.camera.aspect_ratio = width as f64 / height as f64;
             }
-            event::WindowEvent::CloseRequested => {
-                *control_flow = ControlFlow::Exit;
-            }
-            event::WindowEvent::KeyboardInput { input, .. } => {
-                if let event::ElementState::Pressed = input.state {
-                    handle_input(state, input.virtual_keycode)
-                }
+            event::WindowEvent::CloseRequested => {}
+            event::WindowEvent::KeyboardInput { event, .. } => {
+                handle_input(state, event.logical_key)
             }
             _ => (),
         },
@@ -21,13 +31,12 @@ pub fn controls_system(state: &mut State, ev: event::Event<()>, control_flow: &m
     }
 }
 
-fn handle_input(state: &mut State, input: Option<event::VirtualKeyCode>) {
-    if let Some(p_key) = input {
-        for binding in state.settings.keybinds.iter() {
-            if p_key == binding.key {
-                perform_action(binding.action, state);
-                break;
-            }
+fn handle_input(state: &mut State, input: Key) {
+    for binding in state.settings.keybinds.iter() {
+        if input == binding.key {
+            println!("{:?}",binding.key);
+            perform_action(binding.action, state);
+            break;
         }
     }
 }

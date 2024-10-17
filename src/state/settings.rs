@@ -1,6 +1,6 @@
 use self::keybindings::{get_default_keybindings, KeyBinding};
-use glium::glutin::event_loop::EventLoop;
 use serde::Deserialize;
+use winit::window::Window;
 use std::fs::File;
 use std::io::Read;
 
@@ -34,14 +34,8 @@ impl Settings {
             .map_err(ConfigError::FileError)?;
         ron::from_str(&contents).map_err(ConfigError::ParseError)
     }
-    fn create_config(event_loop: &EventLoop<()>) -> Self {
-        let (window_width, window_height) = match event_loop.primary_monitor() {
-            Some(monitor) => {
-                let size = monitor.size();
-                (size.width, size.height)
-            }
-            None => (800, 600),
-        };
+    fn create_config() -> Self {
+        let (window_width, window_height) = (800, 600);
         Self {
             window_width,
             window_height,
@@ -49,10 +43,10 @@ impl Settings {
             keybinds: get_default_keybindings(),
         }
     }
-    pub fn get_config(event_loop: &EventLoop<()>) -> Self {
+    pub fn get_config() -> Self {
         match Self::load_config() {
             Ok(config) => config,
-            Err(_) => Self::create_config(event_loop),
+            Err(_) => Self::create_config(),
         }
     }
 }

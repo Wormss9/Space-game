@@ -1,20 +1,20 @@
+use super::settings::{FullscreenSetting, Settings};
 use glium::{
-    glutin::{
-        dpi::LogicalSize,
-        event_loop::EventLoop,
-        window::{Fullscreen, WindowBuilder},
-        ContextBuilder,
-    },
-    Display,
+    backend::glutin::SimpleWindowBuilder, glutin::surface::WindowSurface,
+    winit::event_loop::EventLoop, Display,
+};
+use winit::{
+    application::ApplicationHandler,
+    event::WindowEvent,
+    event_loop::ActiveEventLoop,
+    window::{Fullscreen, Window, WindowId},
 };
 
-use super::settings::{FullscreenSetting, Settings};
-
 impl FullscreenSetting {
-    pub fn to_setting(&self, event_loop: &EventLoop<()>) -> Option<Fullscreen> {
+    pub fn to_setting(&self, window: Window) -> Option<Fullscreen> {
         match self {
             FullscreenSetting::Exclusive => {
-                let video_mode = event_loop
+                let video_mode = window
                     .primary_monitor()
                     .unwrap()
                     .video_modes()
@@ -22,22 +22,45 @@ impl FullscreenSetting {
                     .unwrap();
                 Some(Fullscreen::Exclusive(video_mode))
             }
-            FullscreenSetting::Borderless => {
-                Some(Fullscreen::Borderless(event_loop.primary_monitor()))
-            }
+            FullscreenSetting::Borderless => Some(Fullscreen::Borderless(window.primary_monitor())),
             FullscreenSetting::Windowed => None,
         }
     }
 }
 
-pub fn create_display(event_loop: &EventLoop<()>, settings: &Settings) -> Display {
-    let wb = WindowBuilder::new()
-        .with_inner_size(LogicalSize::new(
-            settings.window_width,
-            settings.window_height,
-        ))
-        .with_fullscreen(settings.fullscreen.to_setting(event_loop))
-        .with_title("Space-game");
-    let cb = ContextBuilder::new();
-    Display::new(wb, cb, event_loop).unwrap()
+pub fn create_display(
+    event_loop: &EventLoop<()>,
+    settings: &Settings,
+) -> (Window, Display<WindowSurface>) {
+    SimpleWindowBuilder::new()
+        .with_inner_size(settings.window_width, settings.window_height)
+        .with_title("Space-game")
+        .build(event_loop)
+}
+#[derive(Default)]
+struct App {
+    window: Option<Window>,
+}
+
+impl ApplicationHandler for App {
+    fn resumed(&mut self, event_loop: &ActiveEventLoop) {
+        self.window = Some(
+            event_loop
+                .create_window(Window::default_attributes())
+                .unwrap(),
+        );
+    }
+
+    fn window_event(&mut self, event_loop: &ActiveEventLoop, _id: WindowId, event: WindowEvent) {
+        match event {
+            WindowEvent::CloseRequested => {
+                println!("The close button was pressed; stopping");
+                event_loop.exit();
+            }
+            WindowEvent::RedrawRequested => {
+                self.window.as_ref().unwrap().request_redraw();
+            }
+            _ => (),
+        }
+    }
 }

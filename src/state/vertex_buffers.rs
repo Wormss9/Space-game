@@ -1,4 +1,4 @@
-use glium::{Display, VertexBuffer};
+use glium::{glutin::surface::WindowSurface, Display, VertexBuffer};
 use std::collections::HashMap;
 
 use crate::vertex::Vertex;
@@ -8,7 +8,7 @@ pub struct VertexBuffers {
 }
 
 impl VertexBuffers {
-    pub fn new(display: &Display) -> Self {
+    pub fn new(display: &Display<WindowSurface>) -> Self {
         let mut buffers = HashMap::new();
 
         buffers.insert(VertexBufferName::Hex, hex_buffer(display));
@@ -21,7 +21,7 @@ impl VertexBuffers {
     }
 }
 
-fn hex_buffer(display: &Display) -> VertexBuffer<Vertex> {
+fn hex_buffer(display: &Display<WindowSurface>) -> VertexBuffer<Vertex> {
     let hexagon = [
         Vertex {
             position: [0.0, 1.0],

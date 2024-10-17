@@ -6,14 +6,15 @@ pub use self::{
     settings::Settings,
     textures::Textures,
     vertex_buffers::{VertexBufferName, VertexBuffers},
-    window::create_display,
+    window::create_display
 };
 use crate::{
     components::{Position, Rotation, Ship, ShipParts, Tile},
     vector::Vector,
 };
-use glium::{glutin::event_loop::EventLoop, Display};
+use glium::{glutin::surface::WindowSurface, Display,winit::event_loop::EventLoop};
 use hecs::World;
+use winit::window::Window;
 
 mod camera;
 mod clock;
@@ -26,7 +27,7 @@ mod window;
 
 pub struct State {
     pub settings: Settings,
-    pub display: Display,
+    pub display: Display<WindowSurface>,
     pub clock: Clock,
     pub textures: Textures,
     pub game_state: GameState,
@@ -34,12 +35,13 @@ pub struct State {
     pub vertex_buffers: VertexBuffers,
     pub camera: Camera,
     pub world: World,
+    pub window: Window,
 }
 
 impl State {
     pub fn new(event_loop: &EventLoop<()>) -> Self {
-        let settings = Settings::get_config(event_loop);
-        let display = create_display(event_loop, &settings);
+        let settings = Settings::get_config();
+        let (window, display) = create_display(event_loop, &settings);
 
         Self {
             settings,
@@ -51,6 +53,7 @@ impl State {
             camera: Camera::new(&display),
             display,
             world: World::new(),
+            window,
         }
     }
     pub fn add_test_ship(&mut self) {
@@ -150,7 +153,7 @@ impl State {
         };
         let rotation = Rotation {
             rotation: 0.0,
-            rotation_speed: 0.0,
+            rotation_speed: 1.0,
         };
 
         self.world.spawn((ship, position, rotation));

@@ -1,4 +1,4 @@
-use glium::Display;
+use glium::{glutin::surface::WindowSurface, Display, Surface};
 use hecs::{Entity, World};
 
 use crate::{components::Position, vector::Vector};
@@ -14,8 +14,10 @@ pub struct Camera {
 }
 
 impl Camera {
-    pub fn new(display: &Display) -> Self {
-        let (x, y) = display.get_framebuffer_dimensions();
+    pub fn new(display: &Display<WindowSurface>) -> Self {
+        let target = display.draw();
+        let (x, y) = target.get_dimensions();
+        target.finish().unwrap();
         let aspect_ratio = x as f64 / y as f64;
 
         Self {

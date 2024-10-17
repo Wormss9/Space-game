@@ -1,6 +1,5 @@
 use glium::{
-    program::{ProgramCreationInput, SourceCode},
-    Display, Program,
+    glutin::surface::WindowSurface, program::{ProgramCreationInput, SourceCode}, Display, Program
 };
 use std::collections::HashMap;
 
@@ -9,7 +8,7 @@ pub struct Programs {
 }
 
 impl Programs {
-    pub fn new(display: &Display) -> Self {
+    pub fn new(display: &Display<WindowSurface>) -> Self {
         let mut programs = HashMap::new();
 
         programs.insert(ProgramName::Hex, hex_program(display));
@@ -22,7 +21,7 @@ impl Programs {
     }
 }
 
-fn hex_program(display: &Display) -> Program {
+fn hex_program(display: &Display<WindowSurface>) -> Program {
     let vertex_shader_code = std::fs::read_to_string("shaders/base.vert").unwrap();
     let fragment_shader_code = std::fs::read_to_string("shaders/base.frag").unwrap();
 
